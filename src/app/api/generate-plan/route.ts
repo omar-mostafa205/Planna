@@ -7,7 +7,7 @@ import { auth } from "@clerk/nextjs/server";
 
 export const runtime = "nodejs";
 
-const MAX_IMAGE_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_IMAGE_UPLOAD_SIZE = 5 * 1024 * 1024; 
 
 async function compressImage(file: File): Promise<Buffer> {
   const arrayBuffer = await file.arrayBuffer();
@@ -175,12 +175,10 @@ Return EXACTLY this JSON structure:
       response_format: { type: "json_object" }
     });
 
-    // Parse JSON with error handling
     let mealPlanJson;
     try {
       mealPlanJson = JSON.parse(mealPlan.choices[0].message.content || "{}");
       
-      // Validate the structure
       if (!mealPlanJson.meals || !mealPlanJson.calories) {
         throw new Error("Invalid meal plan structure");
       }

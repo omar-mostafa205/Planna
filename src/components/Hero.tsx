@@ -10,15 +10,12 @@ const Hero = () => {
   const router = useRouter();
   return (
     <div className="min-h-screen bg-background ">
-      {/* Grid layout for Left & Right */}
       <div className="grid lg:grid-cols-2 md:grid-cols-2 min-h-screen">
-        {/* Left Side - Textual Content */}
         <div className="flex flex-col justify-center px-8 lg:px-16 py-12 lg:py-0 mt-[-100px]">
           <div className="max-w-lg">
             <div className="mb-8">
               <Logo />
               <div className="flex items-center gap-1 mt-4">
-                {/* Sparkles icon can be added here if you have it */}
                 <span className="text-sm font-medium text-cyan-500">
                   AI Powered Nutrition Planning
                 </span>
@@ -56,7 +53,6 @@ const Hero = () => {
               </Button>
             </div>
 
-            {/* Quick Stats */}
             <div className="grid grid-cols-2 gap-6 text-center">
               <div>
                 <div className="text-2xl font-bold text-blue-600 mb-1">
@@ -75,7 +71,6 @@ const Hero = () => {
         </div>
 
         <div className="relative hidden lg:block h-screen  lg:max-w-[100%">
-  {/* Optional overlay gradient */}
   
   <Image
     src="/tt.png"
@@ -85,7 +80,6 @@ const Hero = () => {
     className='object-cover'
   />
   
-  {/* Optional top gradient overlay */}
 </div>
       </div>
     </div>

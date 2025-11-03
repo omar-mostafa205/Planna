@@ -16,9 +16,8 @@ const navItems = [
 
 const NavBar = () => {
   return (
-    <div className="sticky top-0 z-50 bg-white backdrop-blur supports-[backdrop-filter]:bg-background-white rounded-3xl border-b-1 border-gray-300 w-[90%] mx-auto ">
+    <div className="sticky top-0 z-50 bg-white backdrop-blur supports-[backdrop-filter]:bg-background-white rounded-3xl border-b-1 border-gray-300 w-[90%] mx-auto mt-1">
       <nav className="flex justify-between items-center px-5 md:px-[70px] py-2  ">
-        {/* Logo */}
         <Link href="/" className="text-2xl font-bold text-blue-600">
           <Image
             src="/ll.png"
@@ -30,7 +29,6 @@ const NavBar = () => {
           />
         </Link>
 
-        {/* Desktop Nav */}
         <ul className="hidden md:flex space-x-6">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -45,7 +43,6 @@ const NavBar = () => {
           })}
         </ul>
 
-        {/* Mobile Nav - Sheet Menu */}
         <div className="md:hidden">
           <Sheet>
             <SheetTrigger asChild>

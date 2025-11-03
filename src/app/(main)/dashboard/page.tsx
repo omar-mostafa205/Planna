@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
+import { BackgroundGradient } from "@/components/BackgroundGradient";
 
 interface Meal {
   title: string;
@@ -64,7 +65,6 @@ export default function Dashboard() {
     },
   });
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="w-full px-4 py-8 max-w-7xl mx-auto">
@@ -78,7 +78,6 @@ export default function Dashboard() {
     );
   }
 
-  // Error state
   if (error) {
     const isNotFound = error.message.includes('No meal plan found');
     
@@ -100,31 +99,34 @@ export default function Dashboard() {
                 : error.message
               }
             </p>
-            
-            <div className="space-x-2">
-              {isNotFound ? (
-                <Link 
-                  href="/plan-form"
-                  className="inline-block px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                >
-                  Generate Meal Plan
-                </Link>
-              ) : (
-                <Button 
-                  onClick={() => refetch()}
-                  className="bg-red-500 hover:bg-red-600"
-                >
-                  Try Again
-                </Button>
-              )}
-            </div>
+            <BackgroundGradient 
+  containerClassName="rounded-[22px] max-w-full p-4 sm:p-10 bg-white dark:bg-zinc-900"
+>
+  <div className="space-x-2">
+    {isNotFound ? (
+      <Link 
+        href="/plan-form"
+        className="inline-block px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+      >
+        Generate Meal Plan
+      </Link>
+    ) : (
+      <Button 
+        onClick={() => refetch()}
+        className="bg-red-500 hover:bg-red-600"
+      >
+        Try Again
+      </Button>
+    )}
+  </div>
+</BackgroundGradient>
+
           </div>
         </div>
       </div>
     );
   }
 
-  // No data state (shouldn't happen with proper error handling, but just in case)
   if (!planData) {
     return (
       <div className="w-full px-4 py-8 max-w-7xl mx-auto">
@@ -168,11 +170,10 @@ export default function Dashboard() {
         <InfoBox label="Goal" value={planData.goal} />
       </div>
 
-      {/* Actions */}
       <div className="mb-8 flex gap-4">
 
-        <Link href="/generate-plan">
-          <Button>Generate New Plan</Button>
+        <Link href="/plan-form">
+          <Button className="text">Generate New Plan</Button>
         </Link>
       </div>
 

@@ -16,12 +16,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { FileUploaderField } from "./FileUploaderField";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import axios from "axios";
 import { toast } from "sonner"; 
-import { useRouter } from "next/navigation"; // Fixed import
+import { useRouter } from "next/navigation"; 
 
 const formSchema = z.object({
-  // Client Information
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters long" }),
   age: z.string().refine((val) => /^\d+$/.test(val) && parseInt(val) > 0 && parseInt(val) < 150, { 
     message: "Age must be a valid number between 1 and 149" 
@@ -59,15 +57,12 @@ export function ProfileForm() {
     try {
       const formData = new FormData();
       
-      // Append all form fields
       Object.entries(values).forEach(([key, value]) => {
         if (key === 'images') {
-          // Handle file array
           values.images.forEach(file => {
             formData.append('images', file);
           });
         } else if (value !== undefined && value !== null) {
-          // Handle other fields
           formData.append(key, value.toString());
         }
       });
@@ -75,7 +70,6 @@ export function ProfileForm() {
       const response = await fetch('/api/generate-plan', {
         method: 'POST',
         body: formData,
-        // Don't set Content-Type header - browser will set it automatically with boundary
       });
   
       if (!response.ok) {
@@ -104,7 +98,6 @@ export function ProfileForm() {
           <FileUploaderField form={form} />
         </div>
 
-        {/* Client Information Section */}
         <div className="border border-gray-200 p-6 rounded-2xl bg-white shadow-sm">
           <h1 className="font-bold text-2xl flex items-center gap-2 mb-6">
             <FileUser className="w-6 h-6 text-blue-500" />
@@ -199,7 +192,6 @@ export function ProfileForm() {
           </div>
         </div>
 
-        {/* Goals & Health Information Section */}
         <div className="border border-gray-200 p-6 rounded-2xl bg-white shadow-sm">
           <h1 className="font-bold text-2xl flex items-center gap-2 mb-6">
             <Target className="w-6 h-6 text-blue-500" />
@@ -244,7 +236,7 @@ export function ProfileForm() {
           </div>
         </div>
 
-        {/* Submit Button */}
+        
         <div className="flex bg-gradient-to-r from-blue-500 to-teal-400 p-10 items-center justify-center mb-20 rounded-2xl flex-col">
           <h1 className="text-xl font-bold text-white mb-4">
             Ready to Generate Your AI Diet Plan?

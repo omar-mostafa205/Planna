@@ -2,7 +2,7 @@
 // app/api/webhooks/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma"; // <-- import Prisma client
+import { prisma } from "@/lib/prisma"; 
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
@@ -14,7 +14,6 @@ export async function POST(req: NextRequest) {
 
   let event: Stripe.Event;
 
-  // Verify Stripe event is legit
   try {
     event = stripe.webhooks.constructEvent(
       body,
@@ -43,7 +42,6 @@ export async function POST(req: NextRequest) {
         await handleSubscriptionDeleted(subscription);
         break;
       }
-      // Add more event types as needed
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
@@ -55,7 +53,6 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({});
 }
 
-// Handler for successful checkout sessions
 const handleCheckoutSessionCompleted = async (
   session: Stripe.Checkout.Session
 ) => {
@@ -67,7 +64,6 @@ const handleCheckoutSessionCompleted = async (
     return;
   }
 
-  // Retrieve subscription ID from the session
   const subscriptionId = session.subscription as string;
 
   if (!subscriptionId) {
@@ -76,7 +72,6 @@ const handleCheckoutSessionCompleted = async (
   }
 
   console.log("HHHHEHHEHE");
-  // Update Prisma with subscription details
   try {
     await prisma.profile.update({
       where: { userId },
@@ -105,7 +100,6 @@ const handleInvoicePaymentFailed = async (invoice: Stripe.Invoice) => {
     return;
   }
 
-  // Retrieve userId from subscription ID
   let userId: string | undefined;
   try {
     const profile = await prisma.profile.findUnique({
@@ -124,7 +118,6 @@ const handleInvoicePaymentFailed = async (invoice: Stripe.Invoice) => {
     return;
   }
 
-  // Update Prisma with payment failure
   try {
     await prisma.profile.update({
       where: { userId },

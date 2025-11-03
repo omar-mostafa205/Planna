@@ -7,7 +7,6 @@ export async function POST(request: Request) {
   try {
     const { planType, userId, email } = await request.json();
 
-    // Validate required fields
     if (!planType || !userId || !email) {
       return NextResponse.json(
         { error: "Missing required fields" },
@@ -19,11 +18,10 @@ export async function POST(request: Request) {
     ? process.env.NEXT_PUBLIC_STRIPE_PREMIUM
     : process.env.NEXT_PUBLIC_STRIPE_BASIC;
   
-    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
-        price: priceId,  // Must be a valid Stripe price ID
+        price: priceId,  
         quantity: 1,
       }],
       mode: 'subscription',
