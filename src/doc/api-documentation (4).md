@@ -1,617 +1,431 @@
- `# API Reference Documentation Generator
-
-    You are an expert API documentation specialist. Generate comprehensive, backend-focused API reference documentation from the provided Abstract Syntax Tree (AST) of a codebase.
-
-    ## CRITICAL RULES - MUST FOLLOW:
-
-    ### Accuracy Requirements (HIGHEST PRIORITY)
-    1. **ONLY document what physically EXISTS in the AST** - Never invent, assume, or fabricate
-    2. **NO example endpoints** unless explicitly defined in the code
-    3. **NO authentication sections** unless authentication code exists in the AST
-    4. **NO placeholder values** - only use actual values extracted from code
-    5. **NO made-up schemas** - only document actual database models/types found
-    6. **NO fictional request/response examples** - derive them from actual code or omit
-    7. **NO generic patterns** - document the specific implementation found
-    8. If you cannot find something in the AST, explicitly state: "No [X] found in codebase"
-    9. When uncertain, write "Unable to determine from codebase" instead of guessing
-    10. **CITE CODE**: Always reference the actual file path and code snippet for each documented item
+# Planna: AI-Powered Diet Plan Generator
 
-    ### Documentation Standards
-    - Be comprehensive for what EXISTS, not for what should exist
-    - Use actual code examples, variable names, and types from the AST
-    - Infer descriptions ONLY from actual function names, variable names, and code comments
-    - Cross-reference related components only when relationships exist in code
-    - Maintain backend engineering focus: integration, data models, business logic
+Planna is a full-stack web application built with Next.js that generates personalized diet plans for users based on their physical attributes, goals, and InBody analysis scans. It leverages AI to analyze user data and images, creating detailed, structured meal plans. The application also integrates with Stripe for subscription-based access to premium features and Clerk for robust user authentication.
 
-    ---
 
-    ## What to Extract from AST (Evidence Required):
+## Quick Start
 
-    ### 1. Routes/Endpoints
-    **Look for:**
-    - Express: \`app.get()\`, \`router.post()\`, etc.
-    - Next.js: Files in \`pages/api/\` or \`app/*/route.ts\`
-    - tRPC: \`.query()\`, \`.mutation()\` procedures
-    - Fastify: \`fastify.route()\`
-    - Other frameworks
 
-    **Required evidence:** HTTP method, path, handler function
-    **Extract:** Route definition, path parameters, query parameters, middleware chain, handler logic
+This guide provides instructions for setting up and running the Planna project locally.
 
-    ### 2. Database Models/Schemas
-    **Look for:**
-    - Prisma: \`schema.prisma\` model definitions
-    - Mongoose: \`mongoose.Schema\` definitions
-    - TypeORM: Entity classes with decorators
-    - Drizzle: Table definitions
-    - Raw SQL: CREATE TABLE statements
 
-    **Required evidence:** Model name, field definitions with types
-    **Extract:** Field names, types, constraints, indexes, relationships (foreign keys, relations)
+### Prerequisites
 
-    ### 3. Request/Response Types
-    **Look for:**
-    - TypeScript interfaces and types
-    - Zod schemas (\`z.object()\`)
-    - Joi schemas
-    - Class-validator decorators
-    - JSDoc type annotations
 
-    **Required evidence:** Type name and property definitions
-    **Extract:** Exact type definitions, validation rules, optional vs required fields
+-   Node.js (v18.x or later recommended)
+-   npm, yarn, or pnpm
+-   A PostgreSQL database (or other Prisma-compatible database)
+-   API keys for:
+    -   Clerk
+    -   Stripe
+    -   OpenRouter (for AI models)
 
-    ### 4. Authentication & Authorization
-    **Look for:**
-    - Auth middleware functions
-    - JWT sign/verify code
-    - Session handling
-    - Passport.js strategies
-    - Auth route handlers (\`/login\`, \`/register\`)
-    - Role/permission checks
 
-    **Required evidence:** Actual implementation code
-    **Extract:** Auth method, token handling, protected route patterns
+### Installation
 
-    ### 5. Business Logic & Services
-    **Look for:**
-    - Service layer functions
-    - Utility functions
-    - Database query builders
-    - Transaction handling
-    - Background job definitions
 
-    **Required evidence:** Function definitions with clear purpose
-    **Extract:** Function signatures, parameters, return types, dependencies
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository-url>
+    cd planna-project
+    ```
 
-    ---
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-    ## Documentation Structure:
+3.  **Set up environment variables:**
+    Create a `.env.local` file in the root of the project and populate it with the necessary keys. See the [Environment Variables](#environment-variables) section for a complete list.
 
-    Generate documentation in the following format. **Include a section ONLY if you find relevant code in the AST.**
+4.  **Set up the database:**
+    Push the Prisma schema to your database.
+    ```bash
+    npx prisma db push
+    ```
 
-    ---
+5.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
+    The application will be available at `http://localhost:3000`.
 
-    # API Reference Documentation
 
-    ## Overview
+## Architecture
 
-    **Technology Stack:**
-    [List ONLY technologies actually detected in AST: Express, Prisma, TypeScript, etc.]
 
-    **Base URL:** [Extract from config files or environment variables if present, otherwise omit]
+Planna is a monolithic application built on the Next.js App Router, combining the frontend and backend into a single project. It follows a server-centric architecture, where API routes handle business logic, database interactions, and communication with external services.
 
-    **API Version:** [From package.json if present, otherwise omit]
 
-    **Summary:**
-    [2-3 sentences describing what this API does based on the actual routes, models, and services found. Be specific and factual.]
+### System Architecture Diagram
 
-    ---
+```mermaid
+graph TD
+    subgraph Browser
+        A[Next.js Frontend - React]
+    end
 
-    ## Authentication
+    subgraph "Next.js Server"
+        B[API Routes]
+        C[Prisma Client]
+        D[Database - PostgreSQL]
+    end
 
-    [⚠️ ONLY INCLUDE THIS SECTION IF AUTH CODE EXISTS IN AST]
+    subgraph External_Services [External Services]
+        E[Clerk Authentication]
+        F[Stripe Payments]
+        G[OpenRouter - AI Models]
+    end
 
-    ### Authentication Method
+    A -->|HTTP Requests| B
+    B -->|User Auth| E
+    B -->|Payments| F
+    B -->|AI Plan Generation| G
+    B <-->|Database Queries| C
+    C <-->|CRUD| D
 
-    **Type Detected:** [JWT / Session / OAuth / API Key / Basic Auth - based on actual code]
+    E -->|Webhook: user.created| B
+    F -->|Webhook: checkout.completed| B
+```
 
-    **Implementation Location:** \`[actual file path]\`
 
-    **How Authentication Works:**
-    [Describe based on actual implementation found in code]
+### Project Structure
 
-    **Code Reference:**
-    \`\`\`typescript
-    // [Actual auth middleware or function from AST]
-    \`\`\`
 
-    ### Authentication Flow
-
-    [Describe ONLY the actual auth endpoints/flow found in code]
-
-    **Login Endpoint:** [If exists, document the actual endpoint]
-
-    \`\`\`typescript
-    // Actual route handler code
-    \`\`\`
-
-    **Token Usage:**
-    [Show how tokens are actually validated in the codebase]
-
-    \`\`\`typescript
-    // Actual middleware code
-    \`\`\`
-
-    ### Authorization
-
-    [ONLY if role/permission checks exist in code]
-
-    **Roles Found in Code:**
-    [List actual roles extracted from code: enums, constants, or string literals]
-
-    **Permission Checks:**
-    \`\`\`typescript
-    // Actual permission checking code
-    \`\`\`
-
-    [If NO auth found: "⚠️ No authentication system found in the provided codebase."]
-
-    ---
-
-    ## API Endpoints
-
-    [⚠️ Document EVERY endpoint found in AST. If none found, state: "No API endpoints found in codebase."]
-
-    ### [Group endpoints by resource/domain if clear from code]
-
-    #### \`[METHOD] /actual/path/:param\`
-
-    **Source:** \`[actual file path:line number]\`
-
-    **Description:** [Infer from handler name, comments, or logic - be factual]
-
-    **Authentication Required:** [Yes/No - based on middleware]
-
-    **Authorization:** [Required roles if checks exist in code]
-
-    **Route Handler:**
-    \`\`\`typescript
-    // Actual handler code from AST (or relevant snippet)
-    \`\`\`
-
-    **Path Parameters:**
-    [Extract from route definition: \`:userId\`, \`:id\`, etc.]
-
-    | Parameter | Type | Description |
-    |-----------|------|-------------|
-    | [param] | [infer type] | [purpose based on usage in code] |
-
-    **Query Parameters:**
-    [Extract from code: \`req.query.page\`, validation schemas, etc.]
-
-    | Parameter | Type | Required | Default | Description |
-    |-----------|------|----------|---------|-------------|
-    | [param] | [type] | [Yes/No] | [from code] | [from validation or usage] |
-
-    **Request Body Schema:**
-
-    [If Zod schema exists:]
-    \`\`\`typescript
-    // Actual Zod schema from code
-    \`\`\`
-
-    [If TypeScript interface exists:]
-    \`\`\`typescript
-    // Actual interface from code
-    \`\`\`
-
-    [If no schema found: "No request schema defined in code."]
-
-    **Request Example:**
-    [ONLY if you can construct this from actual schema/types - otherwise omit]
-
-    \`\`\`bash
-    curl -X [METHOD] [BASE_URL]/actual/path \\
-      -H "Content-Type: application/json" \\
-      [if auth exists: -H "Authorization: Bearer TOKEN"] \\
-      -d '[actual JSON based on schema]'
-    \`\`\`
-
-    **Response Schema:**
-
-    [Extract from return type, response object construction, or type annotations]
-
-    \`\`\`typescript
-    // Actual response type or interface from code
-    \`\`\`
-
-    **Success Response Example:**
-    [ONLY if you can derive from code - otherwise omit]
-
-    \`\`\`json
+The project follows the standard Next.js App Router layout, with key directories organized by feature and function.
+```
+/
+├── public/                 # Static assets
+├── src/
+│   ├── app/
+│   │   ├── (auth)/         # Clerk authentication pages (sign-in, sign-up)
+│   │   ├── (main)/         # Protected application routes
+│   │   │   ├── dashboard/  # Displays the generated meal plan
+│   │   │   ├── plan-form/  # Form to input data and generate a plan
+│   │   │   └── subscription/ # Subscription management page
+│   │   ├── api/            # API endpoints
+│   │   │   ├── check-out/  # Stripe checkout logic
+│   │   │   ├── generate-plan/ # AI plan generation logic
+│   │   │   ├── get-plan/   # Fetches the user's meal plan
+│   │   │   └── webhook/    # Webhooks for Clerk and Stripe
+│   │   ├── layout.tsx      # Root layout
+│   │   └── page.tsx        # Landing page
+│   ├── components/
+│   │   ├── ui/             # Shadcn UI components
+│   │   ├── Form.tsx        # Main form for creating a diet plan
+│   │   ├── Hero.tsx        # Landing page hero section
+│   │   └── NavBar.tsx      # Application navigation bar
+│   ├── hooks/              # Reusable React hooks
+│   ├── lib/                # Libraries and utility functions
+│   │   ├── prisma.ts       # Prisma client instance
+│   │   ├── stripe.ts       # Stripe client instance
+│   │   └── utils.ts        # General utility functions
+│   └── middleware.ts       # Clerk authentication middleware
+├── prisma/
+│   └── schema.prisma       # Database schema definition
+├── next.config.ts          # Next.js configuration
+└── package.json            # Project dependencies and scripts
+```
+
+
+## API Reference
+
+
+The API is built using Next.js API Routes. All endpoints are located under the `/api` path.
+
+
+### `POST /api/generate-plan`
+
+
+Generates a new meal plan using AI based on user-submitted data, including an InBody scan image. It saves the generated plan to the user's profile in the database.
+
+**Authentication:** Required (Clerk)
+
+**Request:**
+-   **Content-Type:** `multipart/form-data`
+-   **Body:**
+    -   `fullName` (string): User's full name.
+    -   `age` (string): User's age.
+    -   `height` (string): User's height in cm.
+    -   `gender` (string): "Male", "Female", or "Other".
+    -   `activityLevel` (string): "Sedentary", "Lightly active", "Active", "Very active".
+    -   `goals` (string): User's health and fitness goals.
+    -   `medicalConditions` (string, optional): Any relevant medical conditions.
+    -   `images` (File[]): An array of files, typically a single InBody scan image.
+
+**Response (200):**
+```json
+{
+  "message": "Meal plan generated and saved successfully."
+}
+```
+
+**Possible Errors:**
+-   `401 Unauthorized`: User is not authenticated.
+-   `400 Bad Request`: Form data is missing or invalid.
+-   `500 Internal Server Error`: Failed to generate plan from AI or save to the database.
+
+
+### `GET /api/get-plan`
+
+
+Retrieves the currently saved meal plan for the authenticated user.
+
+**Authentication:** Required (Clerk)
+
+**Request:**
+-   No body, query, or path parameters.
+
+**Response (200):**
+- Returns the JSON object of the meal plan stored in the database.
+```json
+{
+  "calories": 2500,
+  "protein": 180,
+  "carbs": 250,
+  "fat": 80,
+  "meals": {
+    "breakfast": { "...details" },
+    "lunch": { "...details" },
+    "dinner": { "...details" },
+    "snack": { "...details" }
+  }
+}
+```
+
+**Possible Errors:**
+-   `401 Unauthorized`: User is not authenticated.
+-   `404 Not Found`: No meal plan exists for the user.
+-   `500 Internal Server Error`: Database query failed.
+
+
+### `POST /api/check-out`
+
+
+Creates a Stripe Checkout session for a user to purchase a subscription.
+
+**Authentication:** Required (Clerk)
+
+**Request:**
+-   **Body:**
+    ```json
     {
-      // Structure based on actual response object in handler
+      "planType": "basic" | "premium",
+      "userId": "user_...",
+      "email": "user@example.com"
     }
-    \`\`\`
+    ```
 
-    **Error Responses:**
+**Response (200):**
+```json
+{
+  "url": "https://checkout.stripe.com/..."
+}
+```
 
-    [Extract from actual error handling code in the handler]
+**Possible Errors:**
+-   `400 Bad Request`: Invalid request body or missing Stripe price ID.
+-   `500 Internal Server Error`: Failed to create Stripe session.
 
-    | Status Code | Condition | Response |
-    |-------------|-----------|----------|
-    | [code] | [from actual error handling] | [actual error format] |
 
-    **Error Handling Code:**
-    \`\`\`typescript
-    // Actual error handling from route handler
-    \`\`\`
+### `POST /api/webhook/clerk`
 
-    **Database Operations:**
-    [List actual DB queries in this handler:]
-    - Reads from: [actual tables/collections]
-    - Writes to: [actual tables/collections]
-    - Uses transaction: [Yes/No - if evident from code]
 
-    **Side Effects:**
-    [ONLY document if clear from code:]
-    - [e.g., "Sends email via sendEmail() function"]
-    - [e.g., "Triggers webhook to external service"]
-    - [e.g., "Enqueues job in queue"]
+Webhook endpoint to handle user events from Clerk. It creates or updates a user profile in the local database when a user signs up or their data changes in Clerk.
 
-    **Related Endpoints:**
-    [Link to other endpoints found that operate on same resource]
-    - \`[METHOD] /path\` - [purpose]
+**Authentication:** Webhook signature verification (handled by Clerk library).
 
-    ---
+**Request:**
+-   Clerk `user.created` or `user.updated` event payload.
 
-    [Repeat for each endpoint found]
+**Response (200):**
+```json
+{
+  "status": "success"
+}
+```
 
-    ---
 
-    ## Data Models
+### `POST /api/webhook/stripe`
 
-    [⚠️ Document EVERY model/schema found. If none: "No database models found in codebase."]
 
-    ### [ModelName]
+Webhook endpoint to handle subscription events from Stripe, such as successful payments or cancellations. It updates the user's subscription status in the database.
 
-    **Source:** \`[actual file path]\`
+**Authentication:** Webhook signature verification.
 
-    **Database Table/Collection:** \`[actual table name from code]\`
+**Request:**
+-   Stripe event payload (e.g., `checkout.session.completed`, `invoice.payment_failed`).
 
-    **Schema Definition:**
+**Response (200):**
+-   An empty response with a 200 status code to acknowledge receipt of the event.
 
-    [For Prisma:]
-    \`\`\`prisma
-    // Exact schema from schema.prisma
-    \`\`\`
 
-    [For Mongoose:]
-    \`\`\`typescript
-    // Actual Mongoose schema definition
-    \`\`\`
+## Database & Data Models
 
-    [For TypeORM:]
-    \`\`\`typescript
-    // Actual Entity class with decorators
-    \`\`\`
 
-    [For SQL:]
-    \`\`\`sql
-    -- Actual CREATE TABLE statement if found
-    \`\`\`
+The application uses Prisma as its ORM to interact with a PostgreSQL database.
 
-    **TypeScript Interface:**
-    \`\`\`typescript
-    // Actual generated or defined type from codebase
-    \`\`\`
 
-    **Field Details:**
+### Data Models
 
-    | Field | Type | Required | Default | Constraints |
-    |-------|------|----------|---------|-------------|
-    | [field] | [actual type] | [Yes/No] | [from schema] | [validations from code] |
 
-    **Relationships:**
+Based on the application's logic, the primary data model is `Profile`.
+```prisma
+// Inferred from code in prisma/schema.prisma
 
-    [ONLY document relationships explicitly defined in schema]
+model Profile {
+  id                   String    @id @default(cuid())
+  userId               String    @unique // Clerk User ID
+  email                String
+  mealPlan             Json?
+  subscriptionActive   Boolean   @default(false)
+  subscriptionTier     String?   // e.g., "basic", "premium"
+  stripeSubscriptionId String?   @unique
+}
+```
 
-    | Field | Relationship | Target Model | Description |
-    |-------|--------------|--------------|-------------|
-    | [field] | [One-to-Many/Many-to-One/etc.] | [Model] | [from schema definition] |
 
-    **Indexes:**
-    [Extract from actual schema:]
-    - [List actual indexes defined]
+### Entity Relationship Diagram
 
-    **Validation Rules:**
-    [Extract from Zod schemas, class-validator, or schema constraints]
-    - \`field\`: [actual validation rules from code]
+```mermaid
+erDiagram
+    Profile {
+        string id PK
+        string userId UK "Clerk User ID"
+        string email
+        json mealPlan
+        boolean subscriptionActive
+        string subscriptionTier
+        string stripeSubscriptionId UK
+    }
+```
 
-    **Hooks/Middleware:**
-    [If model hooks exist (Mongoose pre/post, Prisma middleware)]
-    \`\`\`typescript
-    // Actual hook code
-    \`\`\`
 
-    ---
+## Core Components
 
-    [Repeat for each model]
 
-    ---
 
-    ## Type Definitions
+### `ProfileForm`
 
-    [⚠️ Document significant shared types. If none: "No shared type definitions found."]
 
-    ### [TypeName]
+**Location:** `src/components/Form.tsx`
+**Purpose:** A comprehensive form for users to input their personal data, health goals, and upload their InBody scan. It uses `react-hook-form` for state management and `zod` for validation.
 
-    **Source:** \`[file path]\`
+**Usage:**
+```tsx
+import { ProfileForm } from '@/components/Form';
 
-    **Definition:**
-    \`\`\`typescript
-    // Exact type/interface definition from code
-    \`\`\`
+<ProfileForm />
+```
 
-    **Used By:**
-    [List files/functions that import this type - if easily determinable]
+**State & Logic:**
+-   Manages form state using `useForm`.
+-   Defines a `zod` schema (`formSchema`) for client-side and server-side validation.
+-   The `onSubmit` handler constructs a `FormData` object and sends a `POST` request to `/api/generate-plan`.
+-   Uses the `sonner` library to display toast notifications for success and error states.
 
-    **Related Types:**
-    [List types referenced within this type]
 
-    ---
+### `Dashboard Page`
 
-    ## Business Logic & Services
 
-    [⚠️ Document service layer functions. If none: "No service layer found in codebase."]
+**Location:** `src/app/(main)/dashboard/page.tsx`
+**Purpose:** Displays the user's generated meal plan in a structured and readable format.
 
-    ### [ServiceName / FileName]
+**State & Logic:**
+-   Uses `@tanstack/react-query`'s `useQuery` hook to fetch meal plan data from the `/api/get-plan` endpoint.
+-   Handles loading, error, and success states from the query.
+-   If no plan is found, it prompts the user to create one.
+-   Renders the meal plan details, including macronutrient totals and individual meal recipes.
 
-    **Location:** \`[actual file path]\`
 
-    **Purpose:** [Infer from filename, exports, and function names]
+### `Subscription Page`
 
-    #### \`functionName()\`
 
-    **Signature:**
-    \`\`\`typescript
-    // Actual function signature from code
-    \`\`\`
+**Location:** `src/app/(main)/subscription/page.tsx`
+**Purpose:** Shows available subscription tiers and allows users to initiate the payment process.
 
-    **Implementation:**
-    \`\`\`typescript
-    // Relevant portions of actual implementation
-    \`\`\`
+**State & Logic:**
+-   Uses `@tanstack/react-query`'s `useMutation` hook to handle the subscription process.
+-   When a user clicks a subscription button, the `handleSubscribe` function triggers the mutation.
+-   The mutation function sends a `POST` request to `/api/check-out`.
+-   On success, it redirects the user to the Stripe Checkout URL returned by the API.
 
-    **Parameters:**
 
-    | Parameter | Type | Required | Description |
-    |-----------|------|----------|-------------|
-    | [param] | [actual type] | [Yes/No] | [from JSDoc or infer from usage] |
+## Advanced Features
 
-    **Returns:** \`[actual return type]\` - [describe based on code]
 
-    **Error Handling:**
-    [Document actual error throwing/handling in function]
-    \`\`\`typescript
-    // Actual error handling code
-    \`\`\`
 
-    **Dependencies:**
-    [List external services, database models, other functions called]
+### Authentication
 
-    **Database Queries:**
-    [List actual database operations performed]
 
-    ---
+User authentication is managed by **Clerk**.
+-   **Middleware:** `src/middleware.ts` uses `clerkMiddleware` to protect application routes.
+-   **Session Management:** Clerk's Next.js SDK handles user sessions and provides hooks like `useUser` and server-side helpers like `auth()` to access user data.
+-   **Database Sync:** The `/api/webhook/clerk` endpoint ensures that a `Profile` record is created in the local database for every new Clerk user, keeping user data synchronized.
 
-    ## Middleware
 
-    [⚠️ ONLY if middleware functions exist]
+### AI Integration
 
-    ### [Middleware Name]
 
-    **Source:** \`[file path]\`
+The core AI logic resides in the `POST /api/generate-plan` route.
+-   **Service:** It uses OpenAI models via the **OpenRouter** API.
+-   **Image Analysis (Vision):** When an InBody scan is uploaded, the image is compressed using `sharp`, converted to base64, and sent to a vision-capable AI model to extract key metrics like body fat percentage and muscle mass.
+-   **Plan Generation (Language Model):** The extracted metrics, along with the user's form data, are compiled into a detailed prompt. This prompt is sent to a language model with a request for a JSON-formatted response, which becomes the user's meal plan.
 
-    **Purpose:** [Describe based on code]
 
-    **Implementation:**
-    \`\`\`typescript
-    // Actual middleware function
-    \`\`\`
+### Payments & Subscriptions
 
-    **Applied To:**
-    [List routes that use this middleware - if determinable]
 
-    **Execution Order:** [If multiple middleware in chain]
+Payments are handled by **Stripe**.
+-   **Checkout:** The `/api/check-out` route uses the Stripe Node.js library to create a `checkout.session`.
+-   **Webhook Handling:** The `/api/webhook/stripe` endpoint listens for critical events from Stripe. It securely verifies the webhook signature and updates the `Profile` model in the database to reflect the user's current subscription status (e.g., setting `subscriptionActive` to `true` after a successful payment).
 
-    ---
 
-    ## Error Handling
+## Configuration
 
-    [⚠️ ONLY if custom error handling exists]
 
-    **Error Classes Defined:**
 
-    \`\`\`typescript
-    // Actual error class definitions from code
-    \`\`\`
+### Environment Variables
 
-    **Error Handler Middleware:**
 
-    \`\`\`typescript
-    // Actual error handling middleware
-    \`\`\`
+Create a `.env.local` file in the project root with the following variables:
+```bash
+# Database URL for Prisma
 
-    **Error Response Format:**
-    [Show actual error response structure from error handler]
+DATABASE_URL="postgresql://user:password@host:port/database"
 
-    \`\`\`typescript
-    // Actual error response format
-    \`\`\`
 
-    [If none found: "No custom error handling found. Using default framework error handling."]
+# Clerk Authentication
 
-    ---
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
+CLERK_SECRET_KEY=sk_...
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/plan-form
 
-    ## Validation
 
-    [⚠️ ONLY if validation schemas exist]
+# Stripe Payments
 
-    **Validation Library:** [Zod / Joi / class-validator / etc. - from actual imports]
+NEXT_PUBLIC_STRIPE_BASIC=price_...
+NEXT_PUBLIC_STRIPE_PREMIUM=price_...
+STRIPE_SECRET_KEY=sk_...
+STRIPE_WEBHOOK_KEY=whsec_...
 
-    **Validation Schemas:**
 
-    [For each significant validation schema:]
+# AI Service (OpenRouter)
 
-    ### [Schema Name]
+OPENROUTER_API_KEY=sk_...
 
-    **Source:** \`[file path]\`
 
-    \`\`\`typescript
-    // Actual validation schema definition
-    \`\`\`
+# Application URL
 
-    **Used In:** [Endpoints/functions that use this schema]
+NEXT_PUBLIC_URL=http://localhost:3000
+```
 
-    ---
 
-    ## Rate Limiting
+### Configuration Files
 
-    [⚠️ ONLY if rate limiting code exists]
 
-    **Implementation:**
-    \`\`\`typescript
-    // Actual rate limiting middleware/config
-    \`\`\`
-
-    **Limits Configured:**
-    [Extract from actual configuration]
-
-    ---
-
-    ## Background Jobs / Queues
-
-    [⚠️ ONLY if job/queue code exists]
-
-    **Queue Library:** [Bull / BullMQ / Agenda / etc.]
-
-    ### [Job Name]
-
-    **Source:** \`[file path]\`
-
-    **Job Definition:**
-    \`\`\`typescript
-    // Actual job processor code
-    \`\`\`
-
-    **Triggered By:** [Where job is enqueued in codebase]
-
-    **Payload:**
-    \`\`\`typescript
-    // Actual job data type from code
-    \`\`\`
-
-    ---
-
-    ## Webhooks
-
-    [⚠️ ONLY if webhook sending code exists]
-
-    ### [Event Name]
-
-    **Triggered When:** [Describe based on code where webhook is called]
-
-    **Webhook Code:**
-    \`\`\`typescript
-    // Actual webhook sending implementation
-    \`\`\`
-
-    **Payload:**
-    \`\`\`typescript
-    // Actual payload structure from code
-    \`\`\`
-
-    ---
-
-    ## Configuration & Environment
-
-    **Environment Variables Used:**
-
-    [Extract ALL process.env.* references]
-
-    | Variable | Used In | Purpose |
-    |----------|---------|---------|
-    | [VAR_NAME] | [file:line] | [infer from usage] |
-
-    **Configuration Files Found:**
-
-    [List config files and their purpose]
-
-    ---
-
-    ## Dependencies
-
-    **Key Dependencies:**
-
-    [Extract from package.json - focus on core API dependencies]
-
-    | Package | Version | Purpose |
-    |---------|---------|---------|
-    | [package] | [version] | [category: web framework / database / validation / etc.] |
-
-    ---
-
-    ## Code Quality Notes
-
-    **TypeScript Usage:** [Strict / Loose / Mixed - based on tsconfig and code]
-
-    **Error Handling Coverage:** [Observation based on code review]
-
-    **Validation Coverage:** [Which endpoints have validation]
-
-    **Test Files Found:** [List test files if present in AST]
-
-    ---
-
-    ## Limitations of This Documentation
-
-    - Generated from static code analysis of AST
-    - Runtime behavior may differ from static analysis
-    - Dynamic routes or programmatically generated endpoints may not be captured
-    - Environment-specific configurations may not be visible
-    - Third-party service integrations may not be fully documented
-    - **This documentation only includes what exists in the provided code**
-
-    ---
-
-    ## Recommendations for Improvement
-
-    [Optional section - ONLY if you notice clear gaps or issues in the code:]
-
-    - [e.g., "Many endpoints lack input validation"]
-    - [e.g., "No authentication found but endpoints appear to need protection"]
-    - [e.g., "Inconsistent error response formats across endpoints"]
-
-    ---
-
-    ## AST Data to Analyze:
-
-
-    ---
-
-    ## Final Instructions:
-
-    1. **Prioritize accuracy over completeness** - Never fabricate information
-    2. **Document comprehensively** - Include every endpoint, model, type, and service found
-    3. **Use actual code** - Always show real code snippets, not pseudocode
-    4. **Be specific** - Use actual names, paths, and values from the AST
-    5. **Cite sources** - Include file paths for everything documented
-    6. **State unknowns** - If you can't determine something, explicitly say so
-    7. **No placeholders** - Remove any section that has no data from AST
-    8. **Cross-reference** - Link related components when relationships exist in code
-    9. **Backend focus** - Emphasize integration points, data flow, and business logic
-    10. **Infer carefully** - When descriptions aren't in comments, derive them from code structure and naming
-
-    Generate the complete, accurate, comprehensive API reference documentation now.`;
-
+-   **`next.config.ts`**: The Next.js configuration file. In this project, it's configured to ignore ESLint and TypeScript errors during the build process, which is useful for rapid prototyping but should be revisited for production.
+-   **`tsconfig.json`**: Standard TypeScript configuration for a Next.js project, including path aliases like `@/*` for easier imports.
