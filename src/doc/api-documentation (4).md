@@ -1,5 +1,4 @@
-    export const apiDocumentationPrompt = (ast) => {
-      return `# API Reference Documentation Generator
+ `# API Reference Documentation Generator
 
     You are an expert API documentation specialist. Generate comprehensive, backend-focused API reference documentation from the provided Abstract Syntax Tree (AST) of a codebase.
 
@@ -598,7 +597,6 @@
 
     ## AST Data to Analyze:
 
-    ${JSON.stringify(ast, null, 2)}
 
     ---
 
@@ -616,4 +614,4 @@
     10. **Infer carefully** - When descriptions aren't in comments, derive them from code structure and naming
 
     Generate the complete, accurate, comprehensive API reference documentation now.`;
-    };
+
