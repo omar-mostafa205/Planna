@@ -18,7 +18,7 @@ export default async function MainLayout({
 
   return (
     <Providers>
-      <div className='bg-[#f7f9fb]'>
+      <div className=''>
         <NavBar />
         {children}
       </div>
